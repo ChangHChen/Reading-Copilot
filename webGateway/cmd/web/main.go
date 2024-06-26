@@ -1,49 +1,40 @@
 package main
 
 import (
-	"html/template"
+	"flag"
+	"log/slog"
 	"net/http"
+	"os"
+	"text/template"
 
-	"github.com/gorilla/websocket"
+	"github.com/alexedwards/scs/v2"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin:     func(r *http.Request) bool { return true },
+type config struct {
+	port string
 }
 
-func chatHandler(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		http.Error(w, "Could not open websocket connection", http.StatusBadRequest)
-		return
-	}
-	defer conn.Close()
-
-	for {
-		msgType, msg, err := conn.ReadMessage()
-		if err != nil {
-			return
-		}
-		// Echoing the message back to the client
-		if err = conn.WriteMessage(msgType, msg); err != nil {
-			return
-		}
-	}
-}
-
-func serveTemplate(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("./static/html/pages/chatTest.tmpl")
-	if err != nil {
-		http.Error(w, "Error loading template", http.StatusInternalServerError)
-		return
-	}
-	tmpl.ExecuteTemplate(w, "chat", nil)
+type application struct {
+	logger         *slog.Logger
+	templateCache  map[string]*template.Template
+	sessionManager *scs.SessionManager
 }
 
 func main() {
-	http.HandleFunc("/chat", serveTemplate)
-	http.HandleFunc("/echo", chatHandler)
-	http.ListenAndServe(":8080", nil)
+	var cfg config
+	flag.StringVar(&cfg.port, "port", "8000", "HTTP network address")
+	flag.Parse()
+
+	app := &application{}
+
+
+	srv := &http.Server{
+		Addr:     ":" + cfg.port,
+		Handler:  app.router(),
+		ErrorLog: slog.NewLogLogger(app.logger.Handler(), slog.LevelError),
+	}
+	app.logger.Info("Starting Server...", slog.Any("port", cfg.port))
+	err := srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
+	app.logger.Error(err.Error())
+	os.Exit(1)
 }
