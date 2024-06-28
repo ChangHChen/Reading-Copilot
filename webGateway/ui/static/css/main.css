@@ -51,7 +51,7 @@ h1 a {
 
 h1 a:hover {
     text-decoration: none;
-    color: #34495E;
+    color: #ff0a0a;
 }
 
 h2 {
@@ -62,12 +62,12 @@ h2 {
 }
 
 a {
-    color: #21d7e4;
+    color: #0e5d63;
     text-decoration: none;
 }
 
 a:hover {
-    color: #1caab5;
+    color: #ffc020;
     text-decoration: underline;
 }
 
