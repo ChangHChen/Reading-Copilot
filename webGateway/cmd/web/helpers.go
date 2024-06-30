@@ -3,15 +3,19 @@ package main
 import (
 	"bytes"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/ChangHChen/Reading-Copilot/webGateway/internal/models"
 	"github.com/alexedwards/scs/mysqlstore"
 	"github.com/alexedwards/scs/v2"
+	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/justinas/nosurf"
 )
 
 func setup(cfg config) *application {
@@ -34,7 +38,9 @@ func setup(cfg config) *application {
 	app := &application{
 		logger:            logger,
 		db:                db,
+		users:             &models.UserModel{DB: db},
 		htmlTemplateCache: htmlTemplateCache,
+		formDecoder:       form.NewDecoder(),
 		sessionManager:    sessionManager,
 	}
 	app.router = app.routes(cfg.staticDir)
@@ -73,10 +79,33 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, status in
 	buf.WriteTo(w)
 }
 
-func (app *application) newTemplateData(r *http.Request) templateData {
+func (app *application) newTemplateData(r *http.Request, form any) templateData {
 	newData := templateData{
-		CurYear: time.Now().Year(),
-		Flash:   app.sessionManager.PopString(r.Context(), "flash"),
+		CurYear:         time.Now().Year(),
+		Flash:           app.sessionManager.PopString(r.Context(), "flash"),
+		Form:            form,
+		IsAuthenticated: app.isAuthenticated(r),
+		CSRFToken:       nosurf.Token(r),
 	}
 	return newData
+}
+
+func (app *application) decodePostForm(r *http.Request, dst any) error {
+	err := r.ParseForm()
+	if err != nil {
+		return err
+	}
+	err = app.formDecoder.Decode(dst, r.PostForm)
+	if err != nil {
+		var invalidDecoderError *form.InvalidDecoderError
+		if errors.As(err, &invalidDecoderError) {
+			panic(err)
+		}
+		return err
+	}
+	return nil
+}
+
+func (app *application) isAuthenticated(r *http.Request) bool {
+	return app.sessionManager.Exists(r.Context(), "authenticatedUserID")
 }

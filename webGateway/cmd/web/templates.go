@@ -8,8 +8,11 @@ import (
 )
 
 type templateData struct {
-	CurYear int
-	Flash   string
+	CurYear         int
+	Flash           string
+	Form            any
+	IsAuthenticated bool
+	CSRFToken       string
 }
 
 func humanTime(t time.Time) string {

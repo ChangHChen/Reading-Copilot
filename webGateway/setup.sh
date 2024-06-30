@@ -1,7 +1,9 @@
 #!/bin/bash
 mysql -u $MYSQL_USER -p"$MYSQL_PASSWORD" --force < sql/schema/readingCopilotSchema.sql
 
-mkdir "tls"
+if [ ! -d "tls" ]; then
+    mkdir "tls"
+fi
 cd "tls"
 if [ -f "cert.pem" ] && [ -f "key.pem" ]; then
     echo "Certificate files already exist. No need to regenerate."

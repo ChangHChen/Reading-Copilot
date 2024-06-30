@@ -1,14 +1,18 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"log/slog"
 	"net/http"
 	"os"
 	"text/template"
+	"time"
 
+	"github.com/ChangHChen/Reading-Copilot/webGateway/internal/models"
 	"github.com/alexedwards/scs/v2"
+	"github.com/go-playground/form/v4"
 )
 
 type config struct {
@@ -20,8 +24,10 @@ type config struct {
 type application struct {
 	logger            *slog.Logger
 	db                *sql.DB
+	users             *models.UserModel
 	router            http.Handler
 	htmlTemplateCache map[string]*template.Template
+	formDecoder       *form.Decoder
 	sessionManager    *scs.SessionManager
 }
 
@@ -36,10 +42,18 @@ func main() {
 
 	defer app.db.Close()
 
+	tlsConfig := &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+	}
+
 	srv := &http.Server{
-		Addr:     cfg.addr,
-		Handler:  app.router,
-		ErrorLog: slog.NewLogLogger(app.logger.Handler(), slog.LevelError),
+		Addr:         cfg.addr,
+		Handler:      app.router,
+		ErrorLog:     slog.NewLogLogger(app.logger.Handler(), slog.LevelError),
+		TLSConfig:    tlsConfig,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 	app.logger.Info("starting server", slog.String("port", cfg.addr))
 
