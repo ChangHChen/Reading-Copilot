@@ -1,16 +1,38 @@
 package main
 
 import (
+	"database/sql"
 	"log/slog"
-	"net/http"
+	"os"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
-func (app *application) serverError(w http.ResponseWriter, r *http.Request, err error) {
-	method, uri := r.Method, r.URL.RequestURI()
-	app.logger.Error(err.Error(), slog.String("method", method), slog.String("uri", uri))
-	http.Error(w, err.Error(), http.StatusInternalServerError)
+func (app *application) setup(cfg config) {
+	var err error
+	app.logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	}))
+	app.db, err = openDB(cfg.dsn)
+	if err != nil {
+		app.fatalError("Errors occured when connecting to the DB", err)
+	}
+	app.router = app.routes(cfg.staticDir)
+	app.htmlTemplateCache, err = newHtmlTemplateCache(cfg.staticDir)
+	if err != nil {
+		app.fatalError("Errors occured when preparing html pages", err)
+	}
 }
 
-func (app *application) clientError(w http.ResponseWriter, status int) {
-	http.Error(w, http.StatusText(status), status)
+func openDB(dsn string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, err
+	}
+	err = db.Ping()
+	if err != nil {
+		db.Close()
+		return nil, err
+	}
+	return db, nil
 }

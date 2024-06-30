@@ -2,9 +2,9 @@ package main
 
 import "net/http"
 
-func (app *application) routes() *http.ServeMux {
+func (app *application) routes(staticDir string) *http.ServeMux {
 	router := http.NewServeMux()
-	fileServer := http.FileServer(http.Dir(app.cfg.staticDir))
+	fileServer := http.FileServer(http.Dir(staticDir))
 	router.Handle("GET /static/", fileServer)
 
 	router.HandleFunc("GET /{$}", app.home)
