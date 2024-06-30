@@ -16,7 +16,7 @@ func (app *application) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
 
-func (app *application) fatalError(msg string, err error) {
-	app.logger.Error(msg, slog.String("error msg", err.Error()))
+func fatalError(logger *slog.Logger, msg string, err error) {
+	logger.Error(msg, slog.String("error msg", err.Error()))
 	os.Exit(1)
 }

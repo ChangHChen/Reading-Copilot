@@ -4,31 +4,17 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"text/template"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	files := []string{
-		"./ui/html/base.tmpl",
-		"./ui/html/pages/home.tmpl",
-		"./ui/html/partials/nav.tmpl",
-	}
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, r, err)
-		return
-
-	}
-	err = ts.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		app.serverError(w, r, err)
-	}
+	data := app.newTemplateData(r)
+	app.render(w, r, http.StatusOK, "home", data)
 
 }
 
 func (app *application) about(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Something about this applicatioin")
+	data := app.newTemplateData(r)
+	app.render(w, r, http.StatusOK, "about", data)
 }
 
 func (app *application) bookView(w http.ResponseWriter, r *http.Request) {
