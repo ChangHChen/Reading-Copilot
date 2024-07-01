@@ -24,6 +24,9 @@ func (app *application) routes() http.Handler {
 
 	authenticatedChain := dynamic.Append(app.requireAuthentication)
 	router.Handle("POST /user/logout", authenticatedChain.ThenFunc(app.logoutPost))
+	router.Handle("GET /user/profile", authenticatedChain.ThenFunc(app.profile))
+	router.Handle("GET /user/password", authenticatedChain.ThenFunc(app.updatePWD))
+	router.Handle("POST /user/password", authenticatedChain.ThenFunc(app.updatePWDPost))
 
 	commonMiddleware := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
 	return commonMiddleware.Then(router)

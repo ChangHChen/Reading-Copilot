@@ -12,7 +12,7 @@ import (
 
 type User struct {
 	ID        int
-	UserName  string
+	Username  string
 	Email     string
 	HashedPWD []byte
 	Created   time.Time
@@ -77,4 +77,18 @@ func (m *UserModel) Exists(id int) (bool, error) {
 	stmt := "SELECT EXISTS(SELECT true FROM users WHERE id = ?)"
 	err := m.DB.QueryRow(stmt, id).Scan(&exists)
 	return exists, err
+}
+
+func (m *UserModel) Get(id int) (User, error) {
+	var user User
+	stmt := `SELECT username, email, created FROM users where id = ?`
+	err := m.DB.QueryRow(stmt, id).Scan(&user.Username, &user.Email, &user.Created)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return User{}, ErrNoRecord
+		} else {
+			return User{}, err
+		}
+	}
+	return user, err
 }

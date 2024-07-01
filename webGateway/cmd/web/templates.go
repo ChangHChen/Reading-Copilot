@@ -7,6 +7,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/ChangHChen/Reading-Copilot/webGateway/internal/models"
 	"github.com/ChangHChen/Reading-Copilot/webGateway/ui"
 )
 
@@ -17,6 +18,7 @@ type templateData struct {
 	IsAuthenticated bool
 	UserName        string
 	CSRFToken       string
+	User            models.User
 }
 
 func humanTime(t time.Time) string {

@@ -1,0 +1,33 @@
+{{define "title"}}Update Password{{end}}
+{{define "main"}}
+<form action='/user/password' method='POST' novalidate>
+    <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
+    {{range .Form.NonFieldErrors}}
+        <div class='error'>{{.}}</div>
+    {{end}}
+    <div>
+        <label>Current Password:</label>
+        {{with .Form.FieldErrors.curpwd}}
+            <label class='error'>{{.}}</label>
+        {{end}}
+        <input type='password' name='curpwd'>
+    </div>
+    <div>
+        <label>New Password:</label>
+        {{with .Form.FieldErrors.newpwd}}
+            <label class='error'>{{.}}</label>
+        {{end}}
+        <input type='password' name='newpwd'>
+    </div>
+    <div>
+        <label>Current Password:</label>
+        {{with .Form.FieldErrors.newpwdconfirm}}
+            <label class='error'>{{.}}</label>
+        {{end}}
+        <input type='password' name='newpwdconfirm'>
+    </div>
+    <div>
+        <input type='submit' value='Change Password'>
+    </div>
+</form>
+{{end}}
