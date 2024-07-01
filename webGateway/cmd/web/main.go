@@ -16,9 +16,8 @@ import (
 )
 
 type config struct {
-	addr      string
-	staticDir string
-	dsn       string
+	addr string
+	dsn  string
 }
 
 type application struct {
@@ -34,7 +33,6 @@ type application struct {
 func main() {
 	var cfg config
 	flag.StringVar(&cfg.addr, "addr", ":4000", "HTTP network address")
-	flag.StringVar(&cfg.staticDir, "static-dir", "./ui", "Path to static files")
 	flag.StringVar(&cfg.dsn, "dsn", "web:pass@/readingcopilot?parseTime=true", "MySQL data source name")
 
 	flag.Parse()

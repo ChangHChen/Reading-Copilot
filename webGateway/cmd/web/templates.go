@@ -1,10 +1,13 @@
 package main
 
 import (
+	"io/fs"
 	"path/filepath"
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/ChangHChen/Reading-Copilot/webGateway/ui"
 )
 
 type templateData struct {
@@ -12,6 +15,7 @@ type templateData struct {
 	Flash           string
 	Form            any
 	IsAuthenticated bool
+	UserName        string
 	CSRFToken       string
 }
 
@@ -23,29 +27,24 @@ var templateFunctions = template.FuncMap{
 	"humanTime": humanTime,
 }
 
-func newHtmlTemplateCache(staticDir string) (map[string]*template.Template, error) {
+func newHtmlTemplateCache() (map[string]*template.Template, error) {
 	htmlCache := map[string]*template.Template{}
-	pages, err := filepath.Glob(staticDir + "/html/pages/*.tmpl")
+	pages, err := fs.Glob(ui.Files, "html/pages/*.tmpl")
 	if err != nil {
 		return nil, err
 	}
 	for _, page := range pages {
 		pageName := strings.TrimSuffix(filepath.Base(page), ".tmpl")
+		patterns := []string{
+			"html/base.tmpl",
+			"html/partials/*.tmpl",
+			page,
+		}
 
-		ts, err := template.New(pageName).Funcs(templateFunctions).ParseFiles("./ui/html/base.tmpl")
+		ts, err := template.New(pageName).Funcs(templateFunctions).ParseFS(ui.Files, patterns...)
 		if err != nil {
 			return nil, err
 		}
-		ts, err = ts.ParseGlob("./ui/html/partials/*.tmpl")
-		if err != nil {
-			return nil, err
-		}
-
-		ts, err = ts.ParseFiles(page)
-		if err != nil {
-			return nil, err
-		}
-
 		htmlCache[pageName] = ts
 	}
 	return htmlCache, nil

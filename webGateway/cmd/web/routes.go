@@ -3,15 +3,15 @@ package main
 import (
 	"net/http"
 
+	"github.com/ChangHChen/Reading-Copilot/webGateway/ui"
 	"github.com/justinas/alice"
 )
 
-func (app *application) routes(staticDir string) http.Handler {
+func (app *application) routes() http.Handler {
 	router := http.NewServeMux()
-	fileServer := http.FileServer(http.Dir(staticDir))
-	router.Handle("GET /static/", fileServer)
 
-	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf)
+	router.Handle("GET /static/", http.FileServerFS(ui.Files))
+	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.validAuthentication)
 	router.Handle("GET /{$}", dynamic.ThenFunc(app.home))
 	router.Handle("GET /about", dynamic.ThenFunc(app.about))
 	router.Handle("GET /book/view/{id}", dynamic.ThenFunc(app.bookView))

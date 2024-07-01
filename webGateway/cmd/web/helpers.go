@@ -26,7 +26,7 @@ func setup(cfg config) *application {
 	if err != nil {
 		fatalError(logger, "Errors occured when connecting to the DB", err)
 	}
-	htmlTemplateCache, err := newHtmlTemplateCache(cfg.staticDir)
+	htmlTemplateCache, err := newHtmlTemplateCache()
 	if err != nil {
 		fatalError(logger, "Errors occured when preparing html pages", err)
 	}
@@ -43,7 +43,7 @@ func setup(cfg config) *application {
 		formDecoder:       form.NewDecoder(),
 		sessionManager:    sessionManager,
 	}
-	app.router = app.routes(cfg.staticDir)
+	app.router = app.routes()
 	return app
 }
 
@@ -87,6 +87,9 @@ func (app *application) newTemplateData(r *http.Request, form any) templateData 
 		IsAuthenticated: app.isAuthenticated(r),
 		CSRFToken:       nosurf.Token(r),
 	}
+	if newData.IsAuthenticated {
+		newData.UserName = app.sessionManager.GetString(r.Context(), "authenticatedUserName")
+	}
 	return newData
 }
 
@@ -107,5 +110,10 @@ func (app *application) decodePostForm(r *http.Request, dst any) error {
 }
 
 func (app *application) isAuthenticated(r *http.Request) bool {
-	return app.sessionManager.Exists(r.Context(), "authenticatedUserID")
+	isAuthenticated, ok := r.Context().Value(isAuthenticatedContextKey).(bool)
+	if !ok {
+		return false
+	}
+	return isAuthenticated
+
 }

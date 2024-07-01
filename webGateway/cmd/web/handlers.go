@@ -55,7 +55,7 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := app.users.Authenticate(form.Email, form.PWD)
+	id, username, err := app.users.Authenticate(form.Email, form.PWD)
 	if err != nil {
 		if errors.Is(err, models.ErrInvalidCredentials) {
 			form.AddNonFieldError("Email or password is incorrect")
@@ -73,6 +73,7 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 	}
 	app.sessionManager.Put(r.Context(), "flash", "Successfully logged in!")
 	app.sessionManager.Put(r.Context(), "authenticatedUserID", id)
+	app.sessionManager.Put(r.Context(), "authenticatedUserName", username)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
@@ -128,6 +129,7 @@ func (app *application) logoutPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.sessionManager.Remove(r.Context(), "authenticatedUserID")
+	app.sessionManager.Remove(r.Context(), "authenticatedUserName")
 	app.sessionManager.Put(r.Context(), "flash", "You've been logged out successfully!")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
