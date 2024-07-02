@@ -12,8 +12,17 @@ import (
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r, nil)
+	books, err := models.GetTopBooksList()
+	data.BookList.Books = books
+	if err != nil {
+		if errors.Is(err, models.ErrFetchingData) {
+			data.BookList.Error = "Trouble getting data via gutendex, please refresh."
+		} else {
+			app.serverError(w, r, err)
+			return
+		}
+	}
 	app.render(w, r, http.StatusOK, "home", data)
-
 }
 
 func (app *application) about(w http.ResponseWriter, r *http.Request) {
@@ -32,8 +41,7 @@ func (app *application) bookView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) login(w http.ResponseWriter, r *http.Request) {
-	data := app.newTemplateData(r, nil)
-	data.Form = userLoginForm{}
+	data := app.newTemplateData(r, userLoginForm{})
 	app.render(w, r, http.StatusOK, "login", data)
 }
 
@@ -79,8 +87,7 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) signUp(w http.ResponseWriter, r *http.Request) {
-	data := app.newTemplateData(r, nil)
-	data.Form = userSignupForm{}
+	data := app.newTemplateData(r, userSignupForm{})
 	app.render(w, r, http.StatusOK, "signup", data)
 }
 

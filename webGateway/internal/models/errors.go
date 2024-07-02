@@ -9,4 +9,5 @@ var (
 	ErrInvalidCredentials = errors.New("models: invalid credentials")
 	ErrDuplicateEmail     = errors.New("models: duplicate email")
 	ErrDuplicateUserName  = errors.New("models: duplicate username")
+	ErrFetchingData       = errors.New("models: error fetching data from gutendex")
 )

@@ -2,6 +2,21 @@
 
 {{define "main"}}
     <h2>Library</h2>
-    <p>Nothing to see... yet!</p>
+    {{if .BookList.Error}}
+        <div class='error'>{{.BookList.Error}}</div>
+    {{else}}
+        <table>
+            <tr>
+                <th>Title</th>
+                <th>Authors</th>
+            </tr>
+            {{range .BookList.Books}}
+            <tr>
+                <td><a href='/book/view/{{.GutenID}}'>{{.Title}}</a></td>
+                <td>{{range .Authors}}{{.Name}}{{end}}</td>
+            </tr>
+        {{end}}
+        </table>
+    {{end}}
 {{end}}
 

@@ -19,6 +19,12 @@ type templateData struct {
 	UserName        string
 	CSRFToken       string
 	User            models.User
+	BookList        bookList
+}
+
+type bookList struct {
+	Error string
+	Books []models.BookMeta
 }
 
 func humanTime(t time.Time) string {

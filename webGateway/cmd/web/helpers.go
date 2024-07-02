@@ -86,6 +86,7 @@ func (app *application) newTemplateData(r *http.Request, form any) templateData 
 		Form:            form,
 		IsAuthenticated: app.isAuthenticated(r),
 		CSRFToken:       nosurf.Token(r),
+		BookList:        bookList{},
 	}
 	if newData.IsAuthenticated {
 		newData.UserName = app.sessionManager.GetString(r.Context(), "authenticatedUserName")
