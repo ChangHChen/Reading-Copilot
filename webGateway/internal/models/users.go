@@ -97,7 +97,7 @@ func (m *UserModel) UpdatePWD(id int, curPWD, newPWD string) error {
 	var hashedPassword []byte
 	stmt := `SELECT hashed_password FROM users WHERE id=?`
 
-	err := m.DB.QueryRow(stmt, id).Scan(&curPWD)
+	err := m.DB.QueryRow(stmt, id).Scan(&hashedPassword)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return ErrNoRecord
@@ -113,7 +113,7 @@ func (m *UserModel) UpdatePWD(id int, curPWD, newPWD string) error {
 			return err
 		}
 	}
-	newHashedPassword, err := bcrypt.GenerateFromPassword([]byte(curPWD), 14)
+	newHashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPWD), 14)
 	if err != nil {
 		return err
 	}

@@ -165,6 +165,7 @@ func (app *application) updatePWDPost(w http.ResponseWriter, r *http.Request) {
 	form.CheckField(validator.NotBlank(form.CurPWD), "curpwd", "Current password cannot be blank")
 	form.CheckField(validator.NotBlank(form.NewPWD), "newpwd", "New password cannot be blank")
 	form.CheckField(validator.MinChars(form.NewPWD, 8), "newpwd", "New password must be at least 8 characters long")
+	form.CheckField(!validator.Repeat(form.CurPWD, form.NewPWD), "newpwd", "New password cannot be the same as current password")
 	form.CheckField(validator.Repeat(form.NewPWD, form.NewPWDConfirm), "newpwdconfirm", "New passwords must match")
 	if !form.Valid() {
 		data := app.newTemplateData(r, form)
@@ -177,7 +178,7 @@ func (app *application) updatePWDPost(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, models.ErrNoRecord) {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 		} else if errors.Is(err, models.ErrInvalidCredentials) {
-			form.AddNonFieldError("Email or password is incorrect")
+			form.AddNonFieldError("Current password is incorrect")
 			data := app.newTemplateData(r, form)
 			app.render(w, r, http.StatusUnprocessableEntity, "updatePWD", data)
 		} else {
@@ -185,5 +186,5 @@ func (app *application) updatePWDPost(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	app.sessionManager.Put(r.Context(), "flash", "Your password has been successfully updated.")
-	http.Redirect(w, r, "user/profile", http.StatusSeeOther)
+	http.Redirect(w, r, "/user/profile", http.StatusSeeOther)
 }
