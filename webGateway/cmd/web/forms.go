@@ -15,3 +15,10 @@ type userLoginForm struct {
 	PWD                 string `form:"pwd"`
 	validator.Validator `form:"-"`
 }
+
+type updatePWDForm struct {
+	CurPWD              string `form:"curpwd"`
+	NewPWD              string `form:"newpwd"`
+	NewPWDConfirm       string `form:"newpwdconfirm"`
+	validator.Validator `form:"-"`
+}

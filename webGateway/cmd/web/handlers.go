@@ -71,7 +71,7 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, r, err)
 		return
 	}
-	app.sessionManager.Put(r.Context(), "flash", "Successfully logged in!")
+	app.sessionManager.Put(r.Context(), "flash", "You have successfully logged in!")
 	app.sessionManager.Put(r.Context(), "authenticatedUserID", id)
 	app.sessionManager.Put(r.Context(), "authenticatedUserName", username)
 
@@ -147,4 +147,43 @@ func (app *application) profile(w http.ResponseWriter, r *http.Request) {
 	}
 	data.User = user
 	app.render(w, r, http.StatusOK, "profile", data)
+}
+
+func (app *application) updatePWD(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(r, updatePWDForm{})
+	app.render(w, r, http.StatusOK, "updatePWD", data)
+}
+
+func (app *application) updatePWDPost(w http.ResponseWriter, r *http.Request) {
+	var form updatePWDForm
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form.CheckField(validator.NotBlank(form.CurPWD), "curpwd", "Current password cannot be blank")
+	form.CheckField(validator.NotBlank(form.NewPWD), "newpwd", "New password cannot be blank")
+	form.CheckField(validator.MinChars(form.NewPWD, 8), "newpwd", "New password must be at least 8 characters long")
+	form.CheckField(validator.Repeat(form.NewPWD, form.NewPWDConfirm), "newpwdconfirm", "New passwords must match")
+	if !form.Valid() {
+		data := app.newTemplateData(r, form)
+		app.render(w, r, http.StatusUnprocessableEntity, "updatePWD", data)
+		return
+	}
+
+	err = app.users.UpdatePWD(app.sessionManager.GetInt(r.Context(), "authenticatedUserID"), form.CurPWD, form.NewPWD)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+		} else if errors.Is(err, models.ErrInvalidCredentials) {
+			form.AddNonFieldError("Email or password is incorrect")
+			data := app.newTemplateData(r, form)
+			app.render(w, r, http.StatusUnprocessableEntity, "updatePWD", data)
+		} else {
+			app.serverError(w, r, err)
+		}
+	}
+	app.sessionManager.Put(r.Context(), "flash", "Your password has been successfully updated.")
+	http.Redirect(w, r, "user/profile", http.StatusSeeOther)
 }

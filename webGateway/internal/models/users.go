@@ -92,3 +92,35 @@ func (m *UserModel) Get(id int) (User, error) {
 	}
 	return user, err
 }
+
+func (m *UserModel) UpdatePWD(id int, curPWD, newPWD string) error {
+	var hashedPassword []byte
+	stmt := `SELECT hashed_password FROM users WHERE id=?`
+
+	err := m.DB.QueryRow(stmt, id).Scan(&curPWD)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrNoRecord
+		} else {
+			return err
+		}
+	}
+	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(curPWD))
+	if err != nil {
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return ErrInvalidCredentials
+		} else {
+			return err
+		}
+	}
+	newHashedPassword, err := bcrypt.GenerateFromPassword([]byte(curPWD), 14)
+	if err != nil {
+		return err
+	}
+	stmt = `UPDATE users SET hashed_password=? WHERE id=?`
+	_, err = m.DB.Exec(stmt, newHashedPassword, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
