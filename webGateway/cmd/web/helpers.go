@@ -39,6 +39,7 @@ func setup(cfg config) *application {
 		logger:            logger,
 		db:                db,
 		users:             &models.UserModel{DB: db},
+		books:             &models.BookModel{DB: db},
 		htmlTemplateCache: htmlTemplateCache,
 		formDecoder:       form.NewDecoder(),
 		sessionManager:    sessionManager,

@@ -12,7 +12,7 @@ import (
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r, nil)
-	books, err := models.GetTopBooksList()
+	books, err := app.books.GetTopBooksList()
 	data.BookList.Books = books
 	if err != nil {
 		if errors.Is(err, models.ErrFetchingData) {

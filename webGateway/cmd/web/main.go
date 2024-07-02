@@ -24,6 +24,7 @@ type application struct {
 	logger            *slog.Logger
 	db                *sql.DB
 	users             *models.UserModel
+	books             *models.BookModel
 	router            http.Handler
 	htmlTemplateCache map[string]*template.Template
 	formDecoder       *form.Decoder

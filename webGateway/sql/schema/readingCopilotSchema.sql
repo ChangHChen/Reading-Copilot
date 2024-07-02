@@ -21,3 +21,8 @@ CREATE TABLE IF NOT EXISTS users (
 ALTER TABLE users ADD CONSTRAINT users_uc_email UNIQUE (email);
 ALTER TABLE users ADD CONSTRAINT users_uc_username UNIQUE (username);
 
+CREATE TABLE IF NOT EXISTS gutendex_cache (
+    cache_key VARCHAR(255) PRIMARY KEY,
+    cache_value JSON,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
