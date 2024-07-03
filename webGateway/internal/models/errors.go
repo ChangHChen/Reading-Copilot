@@ -10,4 +10,5 @@ var (
 	ErrDuplicateEmail     = errors.New("models: duplicate email")
 	ErrDuplicateUserName  = errors.New("models: duplicate username")
 	ErrFetchingData       = errors.New("models: error fetching data from gutendex")
+	ErrNoSearchResult     = errors.New("models: can get any results")
 )

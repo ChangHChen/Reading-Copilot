@@ -195,3 +195,23 @@ func (app *application) updatePWDPost(w http.ResponseWriter, r *http.Request) {
 	app.sessionManager.Put(r.Context(), "flash", "Your password has been successfully updated.")
 	http.Redirect(w, r, "/user/profile", http.StatusSeeOther)
 }
+
+func (app *application) search(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(r, nil)
+	data.BookList.SearchKeyWords = r.FormValue("keyword")
+	bookList, err := models.Search(data.BookList.SearchKeyWords)
+	app.logger.Debug(data.BookList.SearchKeyWords)
+
+	data.BookList.Books = bookList
+	if err != nil {
+		if errors.Is(err, models.ErrFetchingData) {
+			data.BookList.Error = "Trouble getting data via gutendex, please refresh."
+		} else if errors.Is(err, models.ErrNoSearchResult) {
+			data.BookList.Error = "No result, please try with other keywords."
+		} else {
+			app.serverError(w, r, err)
+			return
+		}
+	}
+	app.render(w, r, http.StatusOK, "search", data)
+}

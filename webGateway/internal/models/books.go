@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 
 	apis "github.com/ChangHChen/Reading-Copilot/webGateway/internal/APIs"
 )
@@ -55,6 +56,47 @@ func (m *BookModel) GetTopBooksList() ([]BookMeta, error) {
 		return nil, err
 	}
 	for _, result := range apiResp.Results[:10] {
+		book := BookMeta{
+			GutenID:  result.GutenID,
+			Title:    result.Title,
+			Authors:  result.Authors,
+			ImageURL: result.Formats["image/jpeg"],
+		}
+		books = append(books, book)
+	}
+	return books, nil
+}
+
+func Search(keyword string) ([]BookMeta, error) {
+	var books []BookMeta
+	var jsonData string
+	keyword = url.QueryEscape(keyword)
+	url := fmt.Sprintf("https://gutendex.com//books?search=%s&&sort=popular&&language=en", keyword)
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, ErrFetchingData
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	jsonData = string(body)
+
+	var apiResp apis.BookListAPIResponse
+	if err := json.Unmarshal([]byte(jsonData), &apiResp); err != nil {
+		return nil, err
+	}
+	length := len(apiResp.Results)
+	if length == 0 {
+		return nil, ErrNoSearchResult
+	}
+	if length > 10 {
+		length = 10
+	}
+	for _, result := range apiResp.Results[:length] {
 		book := BookMeta{
 			GutenID:  result.GutenID,
 			Title:    result.Title,

@@ -1,15 +1,15 @@
-{{define "title"}}Home{{end}}
+{{define "title"}}Search{{end}}
 
 {{define "main"}}
-<h2>Library</h2>
     <form id="searchForm" action="/search" method="GET" class="search-form"> 
-        <input type="text" name="keyword" placeholder="Search by title, auther, genre..." required>
+        <input type="text" name="keyword" placeholder="Search by title, auther, genre..." value="{{.BookList.SearchKeyWords}}" required>
         <button type="submit">Search</button>
     </form>
-    {{if .BookList.Error}}
-        <div class='error'>{{.BookList.Error}}</div>
-    {{else}}
-        <h3>Top Pick Books</h3>
+
+    <h3>Search Result</h3>
+        {{if .BookList.Error}}
+            <div class='error'>{{.BookList.Error}}</div>
+        {{else}}
         <table class="book-list-table">
             <tr>
                 <th>Title</th>

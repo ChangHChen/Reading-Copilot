@@ -14,6 +14,7 @@ func (app *application) routes() http.Handler {
 	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.validAuthentication)
 	router.Handle("GET /{$}", dynamic.ThenFunc(app.home))
 	router.Handle("GET /about", dynamic.ThenFunc(app.about))
+	router.Handle("GET /search", dynamic.ThenFunc(app.search))
 	router.Handle("GET /book/view/{id}", dynamic.ThenFunc(app.bookView))
 
 	guestChain := dynamic.Append(app.requireGuest)

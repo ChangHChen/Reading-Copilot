@@ -10,7 +10,7 @@
             <span>
             <form action='/user/logout' method='POST'>
                 <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
-                <button>Logout</button>
+                <button class='logout_button'>Logout</button>
             </form>
             </span>
         {{else}}

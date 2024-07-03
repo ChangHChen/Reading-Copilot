@@ -23,8 +23,9 @@ type templateData struct {
 }
 
 type bookList struct {
-	Error string
-	Books []models.BookMeta
+	Error          string
+	SearchKeyWords string
+	Books          []models.BookMeta
 }
 
 func humanTime(t time.Time) string {
