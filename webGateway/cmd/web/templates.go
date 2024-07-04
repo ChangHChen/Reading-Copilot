@@ -20,6 +20,7 @@ type templateData struct {
 	CSRFToken       string
 	User            models.User
 	BookList        bookList
+	Book            models.BookMeta
 }
 
 type bookList struct {

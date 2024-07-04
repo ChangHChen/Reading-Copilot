@@ -2,12 +2,13 @@ package main
 
 import (
 	"errors"
-	"fmt"
+	"log/slog"
 	"net/http"
 	"strconv"
 
 	"github.com/ChangHChen/Reading-Copilot/webGateway/internal/models"
 	"github.com/ChangHChen/Reading-Copilot/webGateway/internal/validator"
+	"github.com/gorilla/websocket"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -36,8 +37,45 @@ func (app *application) bookView(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusNotFound)
 		return
 	}
-	fmt.Fprintf(w, "Reading book %d\n", id)
 
+	data := app.newTemplateData(r, nil)
+	data.Book.GutenID = id
+
+	app.render(w, r, http.StatusOK, "view", data)
+}
+
+func (app *application) bookWebSocketHandler(w http.ResponseWriter, r *http.Request) {
+	app.logger.Debug("Starting websocket")
+	var upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+	defer conn.Close()
+
+	for {
+		messageType, message, err := conn.ReadMessage()
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				app.serverError(w, r, err)
+			}
+			break
+		}
+		app.logger.Debug("Received message:", slog.String("message", string(message)))
+		response := processWithLLM(string(message))
+		app.logger.Debug("Sending response:", slog.String("response", response))
+		if err = conn.WriteMessage(messageType, []byte(response)); err != nil {
+			app.serverError(w, r, err)
+			break
+		}
+	}
 }
 
 func (app *application) login(w http.ResponseWriter, r *http.Request) {

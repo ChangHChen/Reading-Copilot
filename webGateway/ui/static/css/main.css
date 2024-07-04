@@ -324,3 +324,60 @@ footer {
 .search-form input[type="text"] {
     flex-grow: 1;               
 } 
+
+.book-view-container {
+    display: flex;
+    height: 80vh; /* Use most of the viewport height */
+    margin: 20px;
+}
+
+.reading-window {
+    flex: 2; /* Reading window takes more space */
+    border: 1px solid #ccc;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.chat-window {
+    flex: 1; 
+    border: 1px solid #ccc;
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-window h3 {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 0; 
+}
+
+#chat-log {
+    padding: 10px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+#user-input {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin: 10px;
+}
+
+#send-button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    margin: 0 10px 10px 10px;
+}
+
+.user {
+    text-align: right;
+}
+
+.llm {
+    text-align: left; 
+}

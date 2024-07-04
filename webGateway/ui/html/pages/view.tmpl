@@ -1,0 +1,15 @@
+{{define "title"}}Book View{{end}}
+
+{{define "main"}}
+    <div class="book-view-container">
+        <div class="reading-window">
+            <p>Reading book {{.Book.GutenID}}</p> 
+        </div>
+        <div class="chat-window">
+            <h3>Chat</h3>
+            <div id="chat-log"></div>
+            <input type="text" id="user-input" placeholder="Any questions, copliot ready to help...">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+{{end}}

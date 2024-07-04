@@ -20,6 +20,7 @@ type BookMeta struct {
 	Authors       []apis.Author `json:"authors"`
 	ImageURL      string        `json:"image_url"`
 	LocalImageURL string
+	LocalTextURL  string
 }
 
 type BookModel struct {

@@ -15,6 +15,7 @@ func (app *application) routes() http.Handler {
 	router.Handle("/cache/", app.noDirListing(http.StripPrefix("/cache/", app.noDirListing(cacheFileServer))))
 	router.Handle("GET /static/", app.noDirListing(http.FileServerFS(ui.Files)))
 
+	router.HandleFunc("/ws/book/{id}", app.bookWebSocketHandler)
 	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.validAuthentication)
 	router.Handle("GET /{$}", dynamic.ThenFunc(app.home))
 	router.Handle("GET /about", dynamic.ThenFunc(app.about))

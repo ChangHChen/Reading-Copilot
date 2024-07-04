@@ -88,6 +88,7 @@ func (app *application) newTemplateData(r *http.Request, form any) templateData 
 		IsAuthenticated: app.isAuthenticated(r),
 		CSRFToken:       nosurf.Token(r),
 		BookList:        bookList{},
+		Book:            models.BookMeta{},
 	}
 	if newData.IsAuthenticated {
 		newData.UserName = app.sessionManager.GetString(r.Context(), "authenticatedUserName")
@@ -118,4 +119,8 @@ func (app *application) isAuthenticated(r *http.Request) bool {
 	}
 	return isAuthenticated
 
+}
+
+func processWithLLM(message string) string {
+	return "Repeat: " + message
 }
