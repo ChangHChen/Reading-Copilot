@@ -26,7 +26,7 @@ func chatHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return
 		}
-		// Echoing the message back to the client
+		msg = append(msg, []byte("Hello")...)
 		if err = conn.WriteMessage(msgType, msg); err != nil {
 			return
 		}
@@ -34,7 +34,7 @@ func chatHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func serveTemplate(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("./static/html/pages/chatTest.tmpl")
+	tmpl, err := template.ParseFiles("./chatTest.tmpl")
 	if err != nil {
 		http.Error(w, "Error loading template", http.StatusInternalServerError)
 		return

@@ -381,3 +381,17 @@ footer {
 .llm {
     text-align: left; 
 }
+
+label.cover_image {
+    display: block;
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: center;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+}
+
+label.cover_image img {
+    max-width: 100%; 
+    height: auto;
+}

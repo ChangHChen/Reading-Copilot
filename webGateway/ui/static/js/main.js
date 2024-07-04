@@ -16,8 +16,9 @@ function initializeBookChat(bookId) {
         console.error('Chat elements not found!');
         return; 
     }
-
-    let websocket = new WebSocket("ws://localhost:4000/ws/book/" + bookId);
+    console.log(bookId)
+    console.log("wss://localhost:4000/ws/book/" + bookId)
+    let websocket = new WebSocket("wss://localhost:4000/ws/book/" + bookId);
     websocket.onopen = (event) => {
         console.log("WebSocket connection opened:", event);
     };
@@ -27,14 +28,26 @@ function initializeBookChat(bookId) {
         displayMessage(message, 'llm');
     };
 
+    
     sendButton.addEventListener('click', () => {
+        sendMessage();
+    });
+
+    userInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
+
+    function sendMessage() {
         const message = userInput.value;
         if (message.trim() !== '') {
             websocket.send(message);
             displayMessage(message, 'user');
             userInput.value = '';
         }
-    });
+    }
 
     function displayMessage(message, sender) {
         const messageElement = document.createElement('p');

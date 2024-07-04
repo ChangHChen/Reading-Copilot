@@ -20,9 +20,13 @@
                 <tr>
                     <td>
                     {{if .LocalImageURL}}
-                        <img src="{{.LocalImageURL}}" alt="Cover Image" style="width:100px; height:auto;">
+                    <label class="cover_image">
+                        <img src="{{.LocalImageURL}}" alt="Cover Image">
+                    </label>
                     {{else}}
-                        <img src="cache/no_cover.jpg" alt="No cover available" style="width:100px; height:auto;">
+                    <label class="cover_image">
+                        <img src="/static/img/no_cover.png" alt="No cover available">
+                    </label>
                     {{end}}
                     </td>
                     <td><a href='/book/view/{{.GutenID}}'>{{.Title}}</a></td>
