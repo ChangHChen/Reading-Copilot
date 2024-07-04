@@ -39,7 +39,10 @@ func (app *application) bookView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := app.newTemplateData(r, nil)
-	data.Book, err = models.GetBookCache(id)
+	data.Book, err = app.books.GetBookByID(id)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
 
 	app.render(w, r, http.StatusOK, "view", data)
 }
@@ -245,7 +248,7 @@ func (app *application) search(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, models.ErrFetchingData) {
 			data.BookList.Error = "Trouble getting data via gutendex, please refresh."
 		} else if errors.Is(err, models.ErrNoSearchResult) {
-			data.BookList.Error = "No result, please try with other keywords."
+			data.BookList.Error = "No search result, please try with other keywords."
 		} else {
 			app.serverError(w, r, err)
 			return

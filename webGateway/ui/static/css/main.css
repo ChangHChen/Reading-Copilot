@@ -38,9 +38,9 @@ header a {
     text-decoration: none;
 }
 main {
-    margin-top: 54px;
+    margin-top: 20px;
     margin-bottom: 54px;
-    min-height: calc(100vh - 345px);
+    min-height: calc(100vh - 320px);
     overflow: auto;
 }
 
@@ -63,7 +63,7 @@ h1 a:hover {
 
 h2 {
     font-size: 22px;
-    margin-bottom: 36px;
+    margin-bottom: 15px;
     position: relative;
     top: -9px;
 }
@@ -71,8 +71,8 @@ h2 {
 h3 { 
     font-size: 22px;
     text-align: center;
-    margin-top: 12px;
-    margin-bottom: 12px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 a {
     color: #0e5d63;
@@ -93,10 +93,10 @@ textarea, input:not([type="submit"]) {
 
 nav {
     border-bottom: 1px solid #E4E5E7;
-    padding-top: 17px;
-    padding-bottom: 15px;
-    background: #F7F9FA;
-    height: 60px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background: #ccdbe4;
+    height: 40px;
     color: #6A6C6F;
 }
 
@@ -143,10 +143,10 @@ nav a.live:after {
     display: block;
     position: relative;
     left: calc(50% - 7px);
-    top: 9px;
+    top: 1px;
     width: 14px;
     height: 14px;
-    background: #F7F9FA;
+    background: #ccdbe4;
     border-left: 1px solid #E4E5E7;
     border-bottom: 1px solid #E4E5E7;
     -moz-transform: rotate(45deg);
@@ -327,14 +327,16 @@ footer {
 
 .book-view-container {
     display: flex;
-    height: 80vh; /* Use most of the viewport height */
+    height: calc(100vh - 340px);
     margin: 20px;
+    margin-bottom: 5px;
 }
 
 .reading-window {
-    flex: 2; /* Reading window takes more space */
+    font-family: "Charter", sans-serif;
+    flex: 2; 
     border: 1px solid #ccc;
-    padding: 20px;
+    padding: 40px;
     overflow-y: auto;
 }
 

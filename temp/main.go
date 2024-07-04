@@ -1,49 +1,56 @@
 package main
 
 import (
-	"html/template"
-	"net/http"
-
-	"github.com/gorilla/websocket"
+	"fmt"
+	"os"
+	"strings"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin:     func(r *http.Request) bool { return true },
-}
+func processText(text string) string {
+	lines := strings.Split(text, "\n")
+	var result strings.Builder
 
-func chatHandler(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		http.Error(w, "Could not open websocket connection", http.StatusBadRequest)
-		return
-	}
-	defer conn.Close()
+	for i := 0; i < len(lines); i++ {
+		currentLine := strings.TrimSpace(lines[i])
 
-	for {
-		msgType, msg, err := conn.ReadMessage()
-		if err != nil {
-			return
-		}
-		msg = append(msg, []byte("Hello")...)
-		if err = conn.WriteMessage(msgType, msg); err != nil {
-			return
+		if currentLine == "" {
+			if i+1 < len(lines) && strings.TrimSpace(lines[i+1]) != "" {
+				result.WriteString("\n")
+			}
+		} else {
+			if result.Len() > 0 {
+				result.WriteString(" ")
+			}
+			result.WriteString(currentLine)
 		}
 	}
+
+	return result.String()
 }
 
-func serveTemplate(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("./chatTest.tmpl")
+func readAndProcessFile(inputFilename, outputFilename string) error {
+	content, err := os.ReadFile(inputFilename)
 	if err != nil {
-		http.Error(w, "Error loading template", http.StatusInternalServerError)
-		return
+		return err
 	}
-	tmpl.ExecuteTemplate(w, "chat", nil)
+
+	processedContent := processText(string(content))
+	err = os.WriteFile(outputFilename, []byte(processedContent), 0644)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func main() {
-	http.HandleFunc("/chat", serveTemplate)
-	http.HandleFunc("/echo", chatHandler)
-	http.ListenAndServe(":8080", nil)
+	inputFilename := "plain_text.txt"
+	outputFilename := "output.txt"
+
+	err := readAndProcessFile(inputFilename, outputFilename)
+	if err != nil {
+		fmt.Println("Error processing file:", err)
+		return
+	}
+
+	fmt.Println("File processed successfully.")
 }

@@ -58,9 +58,35 @@ function initializeBookChat(bookId) {
     }
 }
 
+function loadBookContent() {
+    const readingContentDiv = document.getElementById('reading-content');
+    if (!readingContentDiv) {
+        console.error('Reading content div not found!');
+        return;
+    }
+    let bookPath = readingContentDiv.getAttribute('data-book-url');
+    if (!bookPath) {
+        console.error('Book path not found!');
+        return;
+    }
+    if (!bookPath.startsWith('http')) {
+        bookPath = window.location.origin + "/" + bookPath;
+    }
+    fetch(bookPath)
+        .then(response => response.text())
+        .then(text => {
+            readingContentDiv.innerText = text;
+        })
+        .catch(err => {
+            console.error('Error loading the book content:', err);
+            readingContentDiv.innerText = 'Failed to load the book content.';
+        });
+}
+
 if (window.location.pathname.startsWith('/book/view/')) {
     const pathParts = window.location.pathname.split('/');
     const bookId = pathParts[pathParts.length - 1];
 
-    initializeBookChat(bookId); 
+    initializeBookChat(bookId);
+    loadBookContent();
 }
