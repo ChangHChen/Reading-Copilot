@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/justinas/nosurf"
 )
@@ -109,4 +110,14 @@ func (app *application) validAuthentication(next http.Handler) http.Handler {
 		}
 		next.ServeHTTP(w, r)
 	})
+}
+
+func (app *application) noDirListing(fs http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, "/") {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+		fs.ServeHTTP(w, r)
+	}
 }

@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS readingcopilot CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE readingcopilot;
+CREATE DATABASE IF NOT EXISTS reading_copilot CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE reading_copilot;
 
 
 CREATE TABLE IF NOT EXISTS sessions (

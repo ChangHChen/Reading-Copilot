@@ -7,15 +7,19 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
+	"strconv"
 
 	apis "github.com/ChangHChen/Reading-Copilot/webGateway/internal/APIs"
 )
 
 type BookMeta struct {
-	GutenID  int           `json:"id"`
-	Title    string        `json:"title"`
-	Authors  []apis.Author `json:"authors"`
-	ImageURL string        `json:"image_url"`
+	GutenID       int           `json:"id"`
+	Title         string        `json:"title"`
+	Authors       []apis.Author `json:"authors"`
+	ImageURL      string        `json:"image_url"`
+	LocalImageURL string
 }
 
 type BookModel struct {
@@ -56,11 +60,13 @@ func (m *BookModel) GetTopBooksList() ([]BookMeta, error) {
 		return nil, err
 	}
 	for _, result := range apiResp.Results[:10] {
+		localImageURL, _ := cacheCoverImage(result.GutenID, result.Formats["image/jpeg"])
 		book := BookMeta{
-			GutenID:  result.GutenID,
-			Title:    result.Title,
-			Authors:  result.Authors,
-			ImageURL: result.Formats["image/jpeg"],
+			GutenID:       result.GutenID,
+			Title:         result.Title,
+			Authors:       result.Authors,
+			ImageURL:      result.Formats["image/jpeg"],
+			LocalImageURL: localImageURL,
 		}
 		books = append(books, book)
 	}
@@ -97,13 +103,39 @@ func Search(keyword string) ([]BookMeta, error) {
 		length = 10
 	}
 	for _, result := range apiResp.Results[:length] {
+		localImageURL, _ := cacheCoverImage(result.GutenID, result.Formats["image/jpeg"])
 		book := BookMeta{
-			GutenID:  result.GutenID,
-			Title:    result.Title,
-			Authors:  result.Authors,
-			ImageURL: result.Formats["image/jpeg"],
+			GutenID:       result.GutenID,
+			Title:         result.Title,
+			Authors:       result.Authors,
+			ImageURL:      result.Formats["image/jpeg"],
+			LocalImageURL: localImageURL,
 		}
 		books = append(books, book)
 	}
 	return books, nil
+}
+
+func cacheCoverImage(gutenID int, imageURL string) (string, error) {
+	cachePath := filepath.Join("cache", strconv.Itoa(gutenID), "cover.jpg")
+	if _, err := os.Stat(cachePath); os.IsNotExist(err) {
+		if err := os.MkdirAll(filepath.Dir(cachePath), 0755); err != nil {
+			return "", err
+		}
+		resp, err := http.Get(imageURL)
+		if err != nil {
+			return "", err
+		}
+		defer resp.Body.Close()
+		out, err := os.Create(cachePath)
+		if err != nil {
+			return "", err
+		}
+		defer out.Close()
+		_, err = io.Copy(out, resp.Body)
+		if err != nil {
+			return "", err
+		}
+	}
+	return cachePath, nil
 }
