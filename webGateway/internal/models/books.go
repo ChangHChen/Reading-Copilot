@@ -140,3 +140,7 @@ func cacheCoverImage(gutenID int, imageURL string) (string, error) {
 	}
 	return cachePath, nil
 }
+
+func GetBookCache(gutenID int) (BookMeta, error) {
+	
+}

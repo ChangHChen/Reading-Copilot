@@ -39,7 +39,7 @@ func (app *application) bookView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := app.newTemplateData(r, nil)
-	data.Book.GutenID = id
+	data.Book, err = models.GetBookCache(id)
 
 	app.render(w, r, http.StatusOK, "view", data)
 }
