@@ -1,6 +1,7 @@
 package models
 
 import (
+	"bufio"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -23,6 +24,7 @@ type BookMeta struct {
 	TextURL       string
 	LocalImageURL string
 	LocalTextURL  string
+	TotalPageNum  int
 }
 
 type BookModel struct {
@@ -83,7 +85,11 @@ func parseBook(jsonbody []byte) (BookMeta, error) {
 		return BookMeta{}, err
 	}
 	localImageURL, _ := cacheCoverImage(apiResp.GutenID, apiResp.Formats["image/jpeg"])
-	localTextURL, _ := cacheBookText(apiResp.GutenID, apiResp.Formats["text/plain; charset=us-ascii"])
+	localTextFileURL, _ := cacheBookText(apiResp.GutenID, apiResp.Formats["text/plain; charset=us-ascii"])
+	localTextURL, totalPageNum, err := splitTextIntoPages(localTextFileURL)
+	if err != nil {
+		return BookMeta{}, err
+	}
 
 	book = BookMeta{
 		GutenID:       apiResp.GutenID,
@@ -93,6 +99,7 @@ func parseBook(jsonbody []byte) (BookMeta, error) {
 		TextURL:       apiResp.Formats["text/plain; charset=us-ascii"],
 		LocalImageURL: localImageURL,
 		LocalTextURL:  localTextURL,
+		TotalPageNum:  totalPageNum,
 	}
 
 	return book, nil
@@ -250,4 +257,99 @@ func readAndProcessTextFile(filepath string) error {
 		return err
 	}
 	return nil
+}
+
+func splitTextIntoPages(filePath string) (string, int, error) {
+	baseDir := filepath.Dir(filePath)
+	pagesDir := filepath.Join(baseDir, "pages")
+
+	if _, err := os.Stat(pagesDir); !os.IsNotExist(err) {
+		totalPageNum, _ := countTxtFiles(pagesDir)
+		return pagesDir, totalPageNum, nil
+	}
+	err := os.Mkdir(pagesDir, 0755)
+	if err != nil {
+		return "", 0, err
+	}
+
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", 0, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+
+	var paragraphs []string
+	var currentParagraph strings.Builder
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == "" || line == "\n" {
+			if currentParagraph.Len() > 0 {
+				paragraphs = append(paragraphs, currentParagraph.String())
+				currentParagraph.Reset()
+			}
+		} else {
+			if currentParagraph.Len() > 0 {
+				currentParagraph.WriteString(" ")
+			}
+			currentParagraph.WriteString(line)
+		}
+	}
+	if currentParagraph.Len() > 0 {
+		paragraphs = append(paragraphs, currentParagraph.String())
+	}
+
+	pageCount := 1
+	var wordsInPage int
+	var pageContent strings.Builder
+
+	for _, paragraph := range paragraphs {
+		wordCount := len(strings.Fields(paragraph))
+		if wordCount+wordsInPage > 300 && wordsInPage != 0 {
+			err := savePage(pagesDir, pageCount, pageContent.String())
+			if err != nil {
+				return "", 0, err
+			}
+			pageContent.Reset()
+			wordsInPage = 0
+			pageCount++
+		}
+		pageContent.WriteString(paragraph + "\n\n")
+		wordsInPage += wordCount
+	}
+
+	if pageContent.Len() > 0 {
+		err := savePage(pagesDir, pageCount, pageContent.String())
+		if err != nil {
+			return "", 0, err
+		}
+	}
+	totalPageNum, _ := countTxtFiles(pagesDir)
+
+	return pagesDir, totalPageNum, nil
+}
+
+func savePage(dir string, pageNumber int, content string) error {
+	filename := fmt.Sprintf("page_%d.txt", pageNumber)
+	filePath := filepath.Join(dir, filename)
+	return os.WriteFile(filePath, []byte(content), 0644)
+}
+
+func countTxtFiles(dir string) (int, error) {
+	var count int
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && filepath.Ext(path) == ".txt" {
+			count++
+		}
+		return nil
+	})
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

@@ -7,86 +7,118 @@ for (var i = 0; i < navLinks.length; i++) {
 	}
 }
 
-function initializeBookChat(bookId) {
-    const chatLog = document.getElementById('chat-log');
-    const userInput = document.getElementById('user-input');
-    const sendButton = document.getElementById('send-button');
 
-    if (!chatLog || !userInput || !sendButton) {
-        console.error('Chat elements not found!');
-        return; 
-    }
-    console.log(bookId)
-    console.log("wss://localhost:4000/ws/book/" + bookId)
-    let websocket = new WebSocket("wss://localhost:4000/ws/book/" + bookId);
-    websocket.onopen = (event) => {
-        console.log("WebSocket connection opened:", event);
-    };
-
-    websocket.onmessage = (event) => {
-        const message = event.data;
-        displayMessage(message, 'llm');
-    };
-
-    
-    sendButton.addEventListener('click', () => {
-        sendMessage();
-    });
-
-    userInput.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            sendMessage();
-        }
-    });
-
-    function sendMessage() {
-        const message = userInput.value;
-        if (message.trim() !== '') {
-            websocket.send(message);
-            displayMessage(message, 'user');
-            userInput.value = '';
-        }
-    }
-
-    function displayMessage(message, sender) {
-        const messageElement = document.createElement('p');
-        messageElement.classList.add(sender);
-        messageElement.textContent = message;
-        chatLog.appendChild(messageElement);
-        chatLog.scrollTop = chatLog.scrollHeight;
-    }
-}
-
-function loadBookContent() {
+document.addEventListener('DOMContentLoaded', () => {
     const readingContentDiv = document.getElementById('reading-content');
-    if (!readingContentDiv) {
-        console.error('Reading content div not found!');
-        return;
+    const bookDirectory = readingContentDiv.getAttribute('data-book-directory');
+    let currentPage = 1;
+
+    function loadPage(pageNumber) {
+        let pageUrl = `${window.location.origin}/${bookDirectory}/page_${pageNumber}.txt`;
+        fetch(pageUrl)
+            .then(response => response.text())
+            .then(text => {
+                readingContentDiv.innerText = text;
+                currentPage = pageNumber;
+                document.getElementById('page-number').value = pageNumber;
+                document.getElementById('total-pages').textContent = readingContentDiv.getAttribute('data-total-pages');
+            })
+            .catch(err => {
+                console.error('Error loading page:', err);
+                readingContentDiv.innerText = 'Failed to load page content.';
+            });
     }
-    let bookPath = readingContentDiv.getAttribute('data-book-url');
-    if (!bookPath) {
-        console.error('Book path not found!');
-        return;
+
+    function changePage(direction) {
+        const nextPage = currentPage + direction;
+        const totalPages = parseInt(document.getElementById('total-pages').textContent);
+        if (nextPage > 0 && nextPage <= totalPages) {
+            loadPage(nextPage);
+        }
     }
-    if (!bookPath.startsWith('http')) {
-        bookPath = window.location.origin + "/" + bookPath;
+
+    function jumpToPage() {
+        const pageNumber = parseInt(document.getElementById('page-number').value);
+        const totalPages = parseInt(document.getElementById('total-pages').textContent);
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
+            loadPage(pageNumber);
+        }
     }
-    fetch(bookPath)
-        .then(response => response.text())
-        .then(text => {
-            readingContentDiv.innerText = text;
-        })
-        .catch(err => {
-            console.error('Error loading the book content:', err);
-            readingContentDiv.innerText = 'Failed to load the book content.';
+
+    document.getElementById('first-page').addEventListener('click', () => loadPage(1));
+    document.getElementById('prev-page').addEventListener('click', () => changePage(-1));
+    document.getElementById('next-page').addEventListener('click', () => changePage(1));
+    document.getElementById('last-page').addEventListener('click', () => {
+        const totalPages = parseInt(document.getElementById('total-pages').textContent);
+        loadPage(totalPages);
+    });
+    document.getElementById('go-page').addEventListener('click', jumpToPage);
+    document.getElementById('page-number').addEventListener('keypress', function(event) {
+        if (event.key === "Enter") {
+            jumpToPage();
+            event.preventDefault();
+        }
+    });
+
+    loadPage(currentPage);
+
+
+    function initializeBookChat(bookId) {
+        const chatLog = document.getElementById('chat-log');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+    
+        if (!chatLog || !userInput || !sendButton) {
+            console.error('Chat elements not found!');
+            return; 
+        }
+        console.log(bookId)
+        console.log("wss://localhost:4000/ws/book/" + bookId)
+        let websocket = new WebSocket("wss://localhost:4000/ws/book/" + bookId);
+        websocket.onopen = (event) => {
+            console.log("WebSocket connection opened:", event);
+        };
+    
+        websocket.onmessage = (event) => {
+            const message = event.data;
+            displayMessage(message, 'llm');
+        };
+    
+        
+        sendButton.addEventListener('click', () => {
+            sendMessage();
         });
-}
+    
+        userInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+    
+        function sendMessage() {
+            const message = userInput.value;
+            if (message.trim() !== '') {
+                const messageWithPage = message + " (page: " + currentPage + ")"; 
+                websocket.send(messageWithPage);
+                displayMessage(messageWithPage, 'user');
+                userInput.value = '';
+            }
+        }
+    
+        function displayMessage(message, sender) {
+            const messageElement = document.createElement('p');
+            messageElement.classList.add(sender);
+            messageElement.textContent = message;
+            chatLog.appendChild(messageElement);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+    }
 
-if (window.location.pathname.startsWith('/book/view/')) {
-    const pathParts = window.location.pathname.split('/');
-    const bookId = pathParts[pathParts.length - 1];
 
-    initializeBookChat(bookId);
-    loadBookContent();
-}
+    if (window.location.pathname.startsWith('/book/view/')) {
+        const pathParts = window.location.pathname.split('/');
+        const bookId = pathParts[pathParts.length - 1];
+        initializeBookChat(bookId);
+    }
+});

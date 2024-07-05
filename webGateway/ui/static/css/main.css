@@ -39,7 +39,7 @@ header a {
 }
 main {
     margin-top: 20px;
-    margin-bottom: 54px;
+    margin-bottom: 20px;
     min-height: calc(100vh - 320px);
     overflow: auto;
 }
@@ -327,43 +327,57 @@ footer {
 
 .book-view-container {
     display: flex;
-    height: calc(100vh - 340px);
+    height: calc(100vh - 320px);
     margin: 20px;
-    margin-bottom: 5px;
+    margin-bottom: 0px;
+}
+
+.content-area {
+    display: block;
+    width: 60%;
 }
 
 .reading-window {
-    font-family: "Charter", sans-serif;
-    flex: 2; 
+    font-family: "Charter", sans-serif; 
+    font-size:20px;
     border: 1px solid #ccc;
-    padding: 40px;
+    padding: 30px;
     overflow-y: auto;
+    margin-bottom: 0px;
+    display: flex;
+    height: calc(100vh - 365px);
+}
+
+.pagination-controls {
+    text-align: center;
+    height: 15px;
+    padding: 2px;
+    border-top: 1px solid #ccc;
+    margin-bottom: 0px;
 }
 
 .chat-window {
-    flex: 1; 
+    flex: 1;
     border: 1px solid #ccc;
     margin-left: 20px;
+    margin-bottom: 0px;
     display: flex;
     flex-direction: column;
 }
 
 .chat-window h3 {
-    padding: 10px;
+    padding: 2px;
     border-bottom: 1px solid #ccc;
-    margin-bottom: 0; 
 }
 
 #chat-log {
-    padding: 10px;
-    overflow-y: auto;
     flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px;
 }
 
-#user-input {
-    width: calc(100% - 20px);
+#user-input, #send-button {
     padding: 10px;
-    border: 1px solid #ccc;
     margin: 10px;
 }
 
@@ -373,9 +387,8 @@ footer {
     background-color: #4CAF50;
     color: white;
     cursor: pointer;
-    margin: 0 10px 10px 10px;
+    width: auto; /* Adjusts button to fit content */
 }
-
 .user {
     text-align: right;
 }
@@ -383,17 +396,16 @@ footer {
 .llm {
     text-align: left; 
 }
-
 label.cover_image {
     display: block;
-    padding: 10px;
+    padding: 3px;
     border: 1px solid #ccc;
     text-align: center;
     background-color: #f9f9f9;
-    margin-bottom: 20px;
+    max-width: 106px;
 }
 
 label.cover_image img {
-    max-width: 100%; 
+    max-width: 100px; 
     height: auto;
 }
