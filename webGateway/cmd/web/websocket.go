@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/websocket"
 )
@@ -21,6 +22,13 @@ type ProgressMessage struct {
 
 func (app *application) bookWebSocketHandler(w http.ResponseWriter, r *http.Request) {
 	app.logger.Debug("Starting websocket")
+	bookID, err := strconv.Atoi(r.PathValue("id"))
+
+	if err != nil || bookID < 1 {
+		app.clientError(w, http.StatusNotFound)
+		return
+	}
+
 	var upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
@@ -28,7 +36,7 @@ func (app *application) bookWebSocketHandler(w http.ResponseWriter, r *http.Requ
 			return true
 		},
 	}
-
+	userID := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		app.serverError(w, r, err)
@@ -73,7 +81,11 @@ func (app *application) bookWebSocketHandler(w http.ResponseWriter, r *http.Requ
 				return
 			}
 			app.logger.Debug("Reading progress update", slog.Int("page", curPageNum.Page))
-		}
 
+			if err = app.users.UpdateReadingProgress(userID, bookID, curPageNum.Page); err != nil {
+				app.serverError(w, r, err)
+				return
+			}
+		}
 	}
 }

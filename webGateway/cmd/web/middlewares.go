@@ -124,7 +124,7 @@ func (app *application) noDirListing(fs http.Handler) http.HandlerFunc {
 
 func (app *application) storeLastURL(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !strings.Contains(r.URL.Path, "/login") && !strings.Contains(r.URL.Path, "/logout") && !strings.Contains(r.URL.Path, "/signup") && !strings.HasPrefix(r.URL.Path, "/static/") && !strings.HasPrefix(r.URL.Path, "/cache/") {
+		if !strings.Contains(r.URL.Path, "/login") && !strings.Contains(r.URL.Path, "/logout") && !strings.Contains(r.URL.Path, "/signup") && !strings.Contains(r.URL.Path, "/ws/") && !strings.HasPrefix(r.URL.Path, "/static/") && !strings.HasPrefix(r.URL.Path, "/cache/") {
 			app.sessionManager.Put(r.Context(), "lastURL", r.URL.Path)
 		}
 		next.ServeHTTP(w, r)

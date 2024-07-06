@@ -21,6 +21,7 @@ type templateData struct {
 	User            models.User
 	BookList        bookList
 	Book            models.BookMeta
+	CurPage         int
 }
 
 type bookList struct {

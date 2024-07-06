@@ -30,18 +30,26 @@ func (app *application) about(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) bookView(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil || id < 1 {
+	bookID, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil || bookID < 1 {
 		app.clientError(w, http.StatusNotFound)
 		return
 	}
-
 	data := app.newTemplateData(r, nil)
-	data.Book, err = app.books.GetBookByID(id)
+	data.Book, err = app.books.GetBookByID(bookID)
 	if err != nil {
 		app.serverError(w, r, err)
+		return
 	}
-
+	if app.isAuthenticated(r) {
+		userID := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+		pageNum, err := app.users.GetReadingProgress(userID, bookID)
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+		data.CurPage = pageNum
+	}
 	app.render(w, r, http.StatusOK, "view", data)
 }
 

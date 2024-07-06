@@ -15,8 +15,8 @@ func (app *application) routes() http.Handler {
 	router.Handle("GET /cache/", app.noDirListing(http.StripPrefix("/cache/", app.noDirListing(cacheFileServer))))
 	router.Handle("GET /static/", app.noDirListing(http.FileServerFS(ui.Files)))
 
-	router.HandleFunc("/ws/book/{id}", app.bookWebSocketHandler)
-	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.validAuthentication)
+	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.validAuthentication, app.storeLastURL)
+	router.Handle("/ws/book/{id}", dynamic.ThenFunc(app.bookWebSocketHandler))
 	router.Handle("GET /{$}", dynamic.ThenFunc(app.home))
 	router.Handle("GET /about", dynamic.ThenFunc(app.about))
 	router.Handle("GET /search", dynamic.ThenFunc(app.search))
@@ -34,6 +34,6 @@ func (app *application) routes() http.Handler {
 	router.Handle("GET /user/password", authenticatedChain.ThenFunc(app.updatePWD))
 	router.Handle("POST /user/password", authenticatedChain.ThenFunc(app.updatePWDPost))
 
-	commonMiddleware := alice.New(app.recoverPanic, app.logRequest, commonHeaders, app.storeLastURL)
+	commonMiddleware := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
 	return commonMiddleware.Then(router)
 }

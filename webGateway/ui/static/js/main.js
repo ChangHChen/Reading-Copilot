@@ -15,17 +15,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const readingContentDiv = document.getElementById('reading-content');
         const authenticated = readingContentDiv.getAttribute('authenticated') === 'true';
+        let currentPage = readingContentDiv.getAttribute('current-page');
+        currentPage = parseInt(currentPage, 10);
+        const bookDirectory = readingContentDiv.getAttribute('data-book-directory');
         if (readingContentDiv) {
-            const bookDirectory = readingContentDiv.getAttribute('data-book-directory');
-            initializePaginationAndChat(bookId, bookDirectory, authenticated);
+            initializePaginationAndChat(bookId, bookDirectory, authenticated, currentPage);
         } else {
             console.error('Reading content division not found.');
         }
     }
 });
 
-function initializePaginationAndChat(bookId, bookDirectory, authenticated) {
-    let currentPage = 1;
+function initializePaginationAndChat(bookId, bookDirectory, authenticated, currentPage) {
 
     if (authenticated) {
         console.log("authenticated")

@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -35,9 +36,9 @@ func (m *UserModel) Insert(userName, email, pwd string) error {
 		var mySQLError *mysql.MySQLError
 		if errors.As(err, &mySQLError) {
 			if mySQLError.Number == 1062 {
-				if strings.Contains(mySQLError.Message, "users.users_uc_username") {
+				if strings.Contains(mySQLError.Message, "users.username") {
 					return ErrDuplicateUserName
-				} else if strings.Contains(mySQLError.Message, "users.users_uc_email") {
+				} else if strings.Contains(mySQLError.Message, "users.email") {
 					return ErrDuplicateEmail
 				}
 			}
@@ -119,6 +120,36 @@ func (m *UserModel) UpdatePWD(id int, curPWD, newPWD string) error {
 	}
 	stmt = `UPDATE users SET hashed_password=? WHERE id=?`
 	_, err = m.DB.Exec(stmt, newHashedPassword, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *UserModel) GetReadingProgress(userID, bookID int) (int, error) {
+	stmt := `SELECT page FROM reading_progress WHERE user_id=? AND book_id=?`
+	var pageNum int
+	err := m.DB.QueryRow(stmt, userID, bookID).Scan(&pageNum)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			pageNum = 1
+			updateErr := m.UpdateReadingProgress(userID, bookID, pageNum)
+			if updateErr != nil {
+				return 0, fmt.Errorf("failed to initialize reading progress for user %d on book %d: %w", userID, bookID, updateErr)
+			}
+		} else {
+			return 0, err
+		}
+	}
+	return pageNum, nil
+}
+
+func (m *UserModel) UpdateReadingProgress(userID, bookID, pageNum int) error {
+	stmt := `INSERT INTO reading_progress (user_id, book_id, page)
+	VALUES (?, ?, ?)
+	ON DUPLICATE KEY UPDATE page = VALUES(page)`
+
+	_, err := m.DB.Exec(stmt, userID, bookID, pageNum)
 	if err != nil {
 		return err
 	}
