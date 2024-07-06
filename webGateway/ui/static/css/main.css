@@ -318,11 +318,55 @@ footer {
     color: #6A6C6F;
     text-align: center;
 }
-
-.book-list-table {
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    padding: 20px;
     width: 80%;
-    margin-left: auto;
-    margin-right: auto;
+    margin: auto;
+}
+
+.book-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+.cover_image {
+    width: 98%;
+    height: 150px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9; 
+}
+
+.cover_image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.book-title {
+    margin-top: 5px;
+    font-size: 16px;
+    text-align: center;
+}
+.book-link {
+    margin-top: 5px;
+    width: 98%;
+    text-align: center;
+}
+.book-authors {
+    font-size: 14px;
+    color: gray;
+    text-align: center;
 }
 
 .search-form {
@@ -350,8 +394,8 @@ footer {
 }
 
 .reading-window {
-    font-family: "Charter", sans-serif; 
-    font-size:16px;
+    font-family: "Georgia", sans-serif; 
+    font-size:20px;
     border: 1px solid #ccc;
     padding: 30px;
     overflow-y: auto;
@@ -408,19 +452,7 @@ footer {
 .llm {
     text-align: left; 
 }
-label.cover_image {
-    display: block;
-    padding: 3px;
-    border: 1px solid #ccc;
-    text-align: center;
-    background-color: #f9f9f9;
-    max-width: 106px;
-}
 
-label.cover_image img {
-    max-width: 100px; 
-    height: auto;
-}
 
 .login-warning {
     font-size:20px;

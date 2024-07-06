@@ -10,29 +10,22 @@
         <div class='error'>{{.BookList.Error}}</div>
     {{else}}
         <h3>Top Picks</h3>
-        <table class="book-list-table">
-            <tr>
-                <th></th>
-                <th>Title</th>
-                <th>Authors</th>
-            </tr>
+        <div class="book-grid">
             {{range .BookList.Books}}
-                <tr>
-                    <td>
-                    {{if .LocalImageURL}}
-                    <label class="cover_image">
-                        <img src="{{.LocalImageURL}}" alt="Cover Image"
-                    </label>
-                    {{else}}
-                    <label class="cover_image">
-                        <img src="/static/img/no_cover.png" alt="No cover available">
-                    </label>
-                    {{end}}
-                    </td>
-                    <td><a href='/book/view/{{.GutenID}}'>{{.Title}}</a></td>
-                    <td>{{range .Authors}}{{.Name}}{{end}}</td>
-                </tr>
+                <div class="book-item">
+                    <a href='/book/view/{{.GutenID}}' class="book-link">
+                        <div class="cover_image">
+                            {{if .LocalImageURL}}
+                                <img src="{{.LocalImageURL}}" alt="Cover image of {{.Title}}">
+                            {{else}}
+                                <img src="/static/img/no_cover.png" alt="No cover available for {{.Title}}">
+                            {{end}}
+                        </div>
+                        <div class="book-title">{{.Title}}</div>
+                    </a>
+                    <div class="book-authors">{{range .Authors}}{{.Name}}{{end}}</div>
+                </div>
             {{end}}
-        </table>
+        </div>
     {{end}}
 {{end}}
