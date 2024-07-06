@@ -47,7 +47,7 @@ func (app *application) bookWebSocketHandler(w http.ResponseWriter, r *http.Requ
 
 		var generalMsg GeneralMessage
 		if err := json.Unmarshal(message, &generalMsg); err != nil {
-			app.logger.Error("Error decoding message:", err)
+			app.serverError(w, r, err)
 			continue
 		}
 		switch generalMsg.Type {
