@@ -4,7 +4,7 @@
     <h3>{{.Book.Title}}</h3>
     <div class="book-view-container">
         <div class="content-area">
-            <div class="reading-window" id="reading-content" data-book-directory="{{.Book.LocalTextURL}}" data-total-pages="{{.Book.TotalPageNum}}">
+            <div class="reading-window" id="reading-content" data-book-directory="{{.Book.LocalTextURL}}" data-total-pages="{{.Book.TotalPageNum}}" authenticated="{{.IsAuthenticated}}">
                 <p>Loading book content...</p>
             </div>
             <div class="pagination-controls">
@@ -19,9 +19,13 @@
         </div>
         <div class="chat-window">
             <h3>Chat</h3>
-            <div id="chat-log"></div>
-            <input type="text" id="user-input" placeholder="Any questions, copilot ready to help...">
-            <button id="send-button">Send</button>
+            {{if .IsAuthenticated}}
+                <div id="chat-log"></div>
+                <input type="text" id="user-input" placeholder="Any questions, copilot ready to help...">
+                <button id="send-button">Send</button>
+            {{else}}
+                <div><a href="/user/login">Login</a> to access copilot</div>
+            {{end}}
         </div>
     </div>
 {{end}}

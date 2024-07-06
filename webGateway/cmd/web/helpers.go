@@ -124,3 +124,11 @@ func (app *application) isAuthenticated(r *http.Request) bool {
 func processWithLLM(message string) string {
 	return "Repeat: " + message
 }
+
+func (app *application) redirectToLastURL(w http.ResponseWriter, r *http.Request) {
+	lastURL := app.sessionManager.GetString(r.Context(), "lastURL")
+	if lastURL == "" {
+		lastURL = "/"
+	}
+	http.Redirect(w, r, lastURL, http.StatusSeeOther)
+}

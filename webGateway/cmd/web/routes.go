@@ -12,7 +12,7 @@ func (app *application) routes() http.Handler {
 
 	cacheDir := http.Dir("./cache")
 	cacheFileServer := http.FileServer(cacheDir)
-	router.Handle("/cache/", app.noDirListing(http.StripPrefix("/cache/", app.noDirListing(cacheFileServer))))
+	router.Handle("GET /cache/", app.noDirListing(http.StripPrefix("/cache/", app.noDirListing(cacheFileServer))))
 	router.Handle("GET /static/", app.noDirListing(http.FileServerFS(ui.Files)))
 
 	router.HandleFunc("/ws/book/{id}", app.bookWebSocketHandler)
@@ -34,6 +34,6 @@ func (app *application) routes() http.Handler {
 	router.Handle("GET /user/password", authenticatedChain.ThenFunc(app.updatePWD))
 	router.Handle("POST /user/password", authenticatedChain.ThenFunc(app.updatePWDPost))
 
-	commonMiddleware := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
+	commonMiddleware := alice.New(app.recoverPanic, app.logRequest, commonHeaders, app.storeLastURL)
 	return commonMiddleware.Then(router)
 }
