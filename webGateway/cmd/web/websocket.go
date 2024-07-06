@@ -80,7 +80,7 @@ func (app *application) bookWebSocketHandler(w http.ResponseWriter, r *http.Requ
 				app.serverError(w, r, err)
 				return
 			}
-			app.logger.Debug("Reading progress update", slog.Int("page", curPageNum.Page))
+			app.logger.Debug("Reading progress update", slog.Int("user", userID), slog.Int("book", bookID), slog.Int("page", curPageNum.Page))
 
 			if err = app.users.UpdateReadingProgress(userID, bookID, curPageNum.Page); err != nil {
 				app.serverError(w, r, err)

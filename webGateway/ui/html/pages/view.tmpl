@@ -13,7 +13,7 @@
                 <button id="next-page">Next</button>
                 <button id="last-page">Last</button>
                 <input type="number" id="page-number" value="1" min="1">
-                <button id="go-page">Go</button>
+                <button id="go-page">Jump to</button>
                 <span>of <span id="total-pages">{{.Book.TotalPageNum}}</span></span>
             </div>
         </div>
@@ -24,7 +24,7 @@
                 <input type="text" id="user-input" placeholder="Any questions, copilot ready to help...">
                 <button id="send-button">Send</button>
             {{else}}
-                <div><a href="/user/login">Login</a> to access copilot</div>
+                <div class="login-warning">You must <a href="/user/login">Login</a> to access copilot</div>
             {{end}}
         </div>
     </div>

@@ -9,6 +9,12 @@ for (var i = 0; i < navLinks.length; i++) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
+    const flashMessage = document.querySelector('.flash');
+    if (flashMessage) {
+        setTimeout(() => {
+            flashMessage.classList.add('flash-hide');
+        }, 3500);
+    }
     if (window.location.pathname.startsWith('/book/view/')) {
         const pathParts = window.location.pathname.split('/');
         const bookId = pathParts[pathParts.length - 1];

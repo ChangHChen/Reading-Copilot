@@ -40,7 +40,7 @@ header a {
 main {
     margin-top: 20px;
     margin-bottom: 20px;
-    min-height: calc(100vh - 320px);
+    min-height: calc(100vh - 275px);
     overflow: auto;
 }
 
@@ -71,11 +71,11 @@ h2 {
 h3 { 
     font-size: 22px;
     text-align: center;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin-top: 0px;
+    margin-bottom: 0px;
 }
 a {
-    color: #0e5d63;
+    color: #1898a1;
     text-decoration: none;
 }
 
@@ -93,10 +93,10 @@ textarea, input:not([type="submit"]) {
 
 nav {
     border-bottom: 1px solid #E4E5E7;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top: 18px;
+    padding-bottom: 18px;
     background: #ccdbe4;
-    height: 40px;
+    height: 60px;
     color: #6A6C6F;
 }
 
@@ -143,7 +143,7 @@ nav a.live:after {
     display: block;
     position: relative;
     left: calc(50% - 7px);
-    top: 1px;
+    top: 7px;
     width: 14px;
     height: 14px;
     background: #ccdbe4;
@@ -256,6 +256,17 @@ div.flash {
     margin-right: 25%;
     margin-bottom: 36px;
     text-align: center;
+    transition: opacity 0.5s ease-out, padding 0s linear 0.5s, height 0s linear 0.5s, margin-bottom 0s linear 0.5s;
+    opacity: 1;
+    height: auto;
+}
+
+div.flash.flash-hide {
+    opacity: 0;
+    padding: 0;
+    height: 0;
+    margin-bottom: 0;
+    overflow: hidden;
 }
 
 div.error {
@@ -329,17 +340,18 @@ footer {
     display: flex;
     height: calc(100vh - 320px);
     margin: 20px;
+    margin-top: 0px;
     margin-bottom: 0px;
 }
 
 .content-area {
     display: block;
-    width: 60%;
+    width: 55%;
 }
 
 .reading-window {
     font-family: "Charter", sans-serif; 
-    font-size:20px;
+    font-size:16px;
     border: 1px solid #ccc;
     padding: 30px;
     overflow-y: auto;
@@ -350,7 +362,7 @@ footer {
 
 .pagination-controls {
     text-align: center;
-    height: 15px;
+    height: 16px;
     padding: 2px;
     border-top: 1px solid #ccc;
     margin-bottom: 0px;
@@ -387,7 +399,7 @@ footer {
     background-color: #4CAF50;
     color: white;
     cursor: pointer;
-    width: auto; /* Adjusts button to fit content */
+    width: auto;
 }
 .user {
     text-align: right;
@@ -408,4 +420,14 @@ label.cover_image {
 label.cover_image img {
     max-width: 100px; 
     height: auto;
+}
+
+.login-warning {
+    font-size:20px;
+    text-align: center;
+    padding-top: 45%;
+}
+
+.login-warning a{
+    font-size: 20px;
 }
