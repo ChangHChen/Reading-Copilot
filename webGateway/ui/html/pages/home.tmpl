@@ -6,26 +6,26 @@
         <input type="text" name="keyword" placeholder="Search by title, auther, genre..." required>
         <button type="submit">Search</button>
     </form>
+    <h3>Top Picks</h3>
     {{if .BookList.Error}}
         <div class='error'>{{.BookList.Error}}</div>
     {{else}}
-        <h3>Top Picks</h3>
-        <div class="book-grid">
-            {{range .BookList.Books}}
-                <div class="book-item">
-                    <a href='/book/view/{{.GutenID}}' class="book-link">
-                        <div class="cover_image">
-                            {{if .LocalImageURL}}
-                                <img src="{{.LocalImageURL}}" alt="Cover image of {{.Title}}">
-                            {{else}}
-                                <img src="/static/img/no_cover.png" alt="No cover available for {{.Title}}">
-                            {{end}}
-                        </div>
-                        <div class="book-title">{{.Title}}</div>
-                    </a>
-                    <div class="book-authors">{{range .Authors}}{{.Name}}{{end}}</div>
-                </div>
-            {{end}}
-        </div>
+    <div class="book-grid">
+        {{range .BookList.Books}}
+            <div class="book-item">
+                <a href='/book/view/{{.GutenID}}' class="book-link">
+                    <div class="cover_image">
+                        {{if .LocalImageURL}}
+                            <img src="{{.LocalImageURL}}" alt="Cover image of {{.Title}}">
+                        {{else}}
+                            <img src="/static/img/no_cover.png" alt="No cover available for {{.Title}}">
+                        {{end}}
+                    </div>
+                    <div class="book-title">{{.Title}}</div>
+                </a>
+                <div class="book-authors">{{range .Authors}}{{.Name}}{{end}}</div>
+            </div>
+        {{end}}
+    </div>
     {{end}}
 {{end}}

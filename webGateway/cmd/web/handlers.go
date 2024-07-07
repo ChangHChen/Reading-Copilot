@@ -12,7 +12,6 @@ import (
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r, nil)
 	books, err := app.books.GetTopBooksList()
-	data.BookList.Books = books
 	if err != nil {
 		if errors.Is(err, models.ErrFetchingData) {
 			data.BookList.Error = "Trouble getting data via gutendex, please refresh."
@@ -21,6 +20,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	data.BookList.Books = books
 	app.render(w, r, http.StatusOK, "home", data)
 }
 
@@ -51,6 +51,24 @@ func (app *application) bookView(w http.ResponseWriter, r *http.Request) {
 		data.CurPage = pageNum
 	}
 	app.render(w, r, http.StatusOK, "view", data)
+}
+
+func (app *application) history(w http.ResponseWriter, r *http.Request) {
+	userID := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+	data := app.newTemplateData(r, nil)
+	books, err := app.books.GetLatest10History(userID)
+	if err != nil {
+		if errors.Is(err, models.ErrNoSearchResult) {
+			data.BookList.Error = "No history found, start your reading journey!"
+		} else if errors.Is(err, models.ErrFetchingData) {
+			data.BookList.Error = "Trouble getting data via gutendex, please refresh."
+		} else {
+			app.serverError(w, r, err)
+			return
+		}
+	}
+	data.BookList.Books = books
+	app.render(w, r, http.StatusOK, "history", data)
 }
 
 func (app *application) login(w http.ResponseWriter, r *http.Request) {

@@ -27,9 +27,11 @@ CREATE TABLE IF NOT EXISTS reading_progress (
     id INT AUTO_INCREMENT,
     user_id INT,
     book_id INT,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     page INT,
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users(id),
     UNIQUE (user_id, book_id),
-    INDEX user_book_idx (user_id, book_id)
+    INDEX user_book_idx (user_id, book_id),
+    INDEX user_idx(user_id)
 );

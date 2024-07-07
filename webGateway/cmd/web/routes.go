@@ -33,6 +33,7 @@ func (app *application) routes() http.Handler {
 	router.Handle("GET /user/profile", authenticatedChain.ThenFunc(app.profile))
 	router.Handle("GET /user/password", authenticatedChain.ThenFunc(app.updatePWD))
 	router.Handle("POST /user/password", authenticatedChain.ThenFunc(app.updatePWDPost))
+	router.Handle("GET /user/history", authenticatedChain.ThenFunc(app.history))
 
 	commonMiddleware := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
 	return commonMiddleware.Then(router)

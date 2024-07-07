@@ -1,0 +1,26 @@
+{{define "title"}}History{{end}}
+
+{{define "main"}}
+    <h2>Reading History</h2>
+        {{if .BookList.Error}}
+            <div class='error'>{{.BookList.Error}}</div>
+        {{else}}
+        <div class="book-grid">
+            {{range .BookList.Books}}
+                <div class="book-item">
+                    <a href='/book/view/{{.GutenID}}' class="book-link">
+                        <div class="cover_image">
+                            {{if .LocalImageURL}}
+                                <img src="/{{.LocalImageURL}}" alt="Cover image of {{.Title}}">
+                            {{else}}
+                                <img src="/static/img/no_cover.png" alt="No cover available for {{.Title}}">
+                            {{end}}
+                        </div>
+                        <div class="book-title">{{.Title}}</div>
+                    </a>
+                    <div class="book-authors">{{range .Authors}}{{.Name}}{{end}}</div>
+                </div>
+            {{end}}
+        </div>
+    {{end}}
+{{end}}

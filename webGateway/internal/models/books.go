@@ -155,6 +155,40 @@ func (m *BookModel) GetBookByID(id int) (BookMeta, error) {
 	return book, nil
 }
 
+func (m *BookModel) GetLatest10History(userID int) ([]BookMeta, error) {
+	var bookIDList []int
+	stmt := `SELECT book_id FROM reading_progress WHERE user_id=? ORDER BY last_updated DESC LIMIT 10`
+	rows, err := m.DB.Query(stmt, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var bookID int
+		if err := rows.Scan(&bookID); err != nil {
+			return nil, err
+		}
+		bookIDList = append(bookIDList, bookID)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	if len(bookIDList) == 0 {
+		return nil, ErrNoSearchResult
+	}
+
+	books := make([]BookMeta, len(bookIDList))
+
+	for i, bookID := range bookIDList {
+		books[i], err = m.GetBookByID(bookID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return books, nil
+}
+
 func Search(keyword string) ([]BookMeta, error) {
 	var books []BookMeta
 	keyword = url.QueryEscape(keyword)
