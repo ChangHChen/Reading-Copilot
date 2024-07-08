@@ -20,6 +20,26 @@
         <div class="chat-window">
             <h3>Chat</h3>
             {{if .IsAuthenticated}}
+                <select id="model-select">
+                    {{if .APIKeys.OpenAIKeyReady}}
+                        <option value="GPT-4o">GPT-4o</option>
+                        <option value="GPT-4">GPT-4</option>
+                    {{else}}
+                        <option disabled>Set OpenAI key to use GPT models</option>
+                    {{end}}
+                    {{if .APIKeys.AnthropicKeyReady}}
+                        <option value="Claude 3.5 Sonnet">Claude 3.5 Sonnet</option>
+                    {{else}}
+                        <option disabled>Set Anthropic key to use Claude models</option>
+                    {{end}}
+                    {{if .APIKeys.GoogleKeyReady}}
+                        <option value="Gemini 1.5 Pro">Gemini 1.5 Pro</option>
+                        <option value="Gemini 1.5 Flash">Gemini 1.5 Flash</option>
+                    {{else}}
+                        <option disabled>Set Google key to use Gemini models</option>
+                    {{end}}
+                    <option value="Local Model">Local Model</option>
+                </select>
                 <div id="chat-log"></div>
                 <input type="text" id="user-input" placeholder="Any questions, copilot ready to help...">
                 <button id="send-button">Send</button>

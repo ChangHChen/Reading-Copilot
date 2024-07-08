@@ -2,10 +2,6 @@
 
 {{define "main"}}
 <h2>Library</h2>
-    <form id="searchForm" action="/search" method="GET" class="search-form"> 
-        <input type="text" name="keyword" placeholder="Search by title, auther, genre..." required>
-        <button type="submit">Search</button>
-    </form>
     <h3>Top Picks</h3>
     {{if .BookList.Error}}
         <div class='error'>{{.BookList.Error}}</div>

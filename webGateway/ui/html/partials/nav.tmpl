@@ -8,6 +8,12 @@
         {{end}}
     </div>
     <div>
+    <form id="searchForm" action="/search" method="GET" class="search-form"> 
+        <input type="text" name="keyword" placeholder="Search by title, auther, genre..." value="{{.BookList.SearchKeyWords}}" required>
+        <button type="submit">Search</button>
+    </form>
+    </div>
+    <div>
         {{if .IsAuthenticated}}
             <span>Hi! <a href='/user/profile'>{{.UserName}}</a></span>
             <span>

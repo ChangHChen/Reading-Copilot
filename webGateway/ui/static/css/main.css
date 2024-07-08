@@ -92,12 +92,23 @@ textarea, input:not([type="submit"]) {
 
 
 nav {
+    display: flex;
+    align-items: center; 
+    justify-content: space-between;
     border-bottom: 1px solid #E4E5E7;
-    padding-top: 18px;
-    padding-bottom: 18px;
     background: #ccdbe4;
     height: 60px;
     color: #6A6C6F;
+}
+
+nav div:first-child, nav div:last-child {
+    flex: 0 0 25%;
+}
+
+nav div:nth-child(2) {
+    flex: 0 0 50%;
+    display: flex;
+    justify-content: center;
 }
 
 nav a {
@@ -110,7 +121,6 @@ nav form {
 }
 
 nav div {
-    width: 50%;
     float: left;
 }
 
@@ -118,6 +128,7 @@ nav div:first-child span{
     margin-right: 1.5em;
     margin-left: 0;
 }
+
 
 nav div:last-child {
     text-align: right;
@@ -128,8 +139,20 @@ nav div:last-child span {
     margin-right: 0;
 }
 
+.search-form {
+    display: flex;                
+    flex-direction: row;         
+    width: 90%;
+    margin: 0 auto;
+    align-items: center; 
+}
+
+.search-form input[type="text"] {
+    flex-grow: 1;               
+} 
 
 nav a.live {
+    position: relative;
     color: #34495E;
     cursor: default;
 }
@@ -141,17 +164,19 @@ nav a.live:hover {
 nav a.live:after {
     content: '';
     display: block;
-    position: relative;
-    left: calc(50% - 7px);
-    top: 7px;
+    position: absolute;
+    left: 50%;            
+    bottom: -23px;          
+    transform: translateX(-50%) rotate(45deg);
     width: 14px;
     height: 14px;
     background: #ccdbe4;
     border-left: 1px solid #E4E5E7;
     border-bottom: 1px solid #E4E5E7;
-    -moz-transform: rotate(45deg);
-    -webkit-transform: rotate(-45deg);
+    z-index: 1;   
 }
+
+
 button {
     background-color: transparent; 
     border: none;                 
@@ -321,9 +346,9 @@ footer {
 .book-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 20px;
+    gap: 5px;
     padding: 20px;
-    width: 80%;
+    width: 100%;
     margin: auto;
 }
 
@@ -369,16 +394,7 @@ footer {
     text-align: center;
 }
 
-.search-form {
-    display: flex;                
-    flex-direction: row;         
-    width: 80%;
-    margin: 0 auto;
-}
 
-.search-form input[type="text"] {
-    flex-grow: 1;               
-} 
 
 .book-view-container {
     display: flex;
@@ -405,11 +421,21 @@ footer {
 }
 
 .pagination-controls {
+    display: flex;              
+    justify-content: space-between; 
+    align-items: center;  
     text-align: center;
-    height: 16px;
-    padding: 2px;
+    height: 40px;
     border-top: 1px solid #ccc;
-    margin-bottom: 0px;
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+.pagination-controls button {           
+    padding: 3px;                     
+}
+.pagination-controls input {
+    width: 50px;
 }
 
 .chat-window {

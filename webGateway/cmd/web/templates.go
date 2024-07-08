@@ -22,8 +22,13 @@ type templateData struct {
 	BookList        bookList
 	Book            models.BookMeta
 	CurPage         int
+	APIKeys         apiKeys
 }
-
+type apiKeys struct {
+	OpenAIKeyReady    bool
+	AnthropicKeyReady bool
+	GoogleKeyReady    bool
+}
 type bookList struct {
 	Error          string
 	SearchKeyWords string

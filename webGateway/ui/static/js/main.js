@@ -65,11 +65,14 @@ function initializePaginationAndChat(bookId, bookDirectory, authenticated, curre
     
         function sendMessage() {
             const messageText = userInput.value;
+            const selectedModel = document.getElementById('model-select').value;
+        
             if (messageText.trim() !== '') {
                 const messageData = {
                     type: 'chat',
                     message: messageText,
-                    page: currentPage
+                    page: currentPage,
+                    model: selectedModel
                 };
                 websocket.send(JSON.stringify(messageData));
                 displayMessage(messageText, 'user');

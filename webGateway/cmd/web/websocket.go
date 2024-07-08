@@ -15,6 +15,7 @@ type GeneralMessage struct {
 type ChatMessage struct {
 	Message string `json:"message"`
 	Page    int    `json:"page"`
+	Model   string `json:"model"`
 }
 type ProgressMessage struct {
 	Page int `json:"page"`
@@ -68,7 +69,11 @@ func (app *application) bookWebSocketHandler(w http.ResponseWriter, r *http.Requ
 
 			app.logger.Debug("Received message:", slog.String("message", msg.Message), slog.Int("page", msg.Page))
 
-			response := processWithLLM(msg.Message)
+			response, err := processWithLLM(msg, bookID)
+			if err != nil {
+				app.serverError(w, r, err)
+				return
+			}
 			app.logger.Debug("Sending response:", slog.String("response", response))
 			if err = conn.WriteMessage(websocket.TextMessage, []byte(response)); err != nil {
 				app.serverError(w, r, err)

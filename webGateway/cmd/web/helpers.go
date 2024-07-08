@@ -3,13 +3,16 @@ package main
 import (
 	"bytes"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	"os"
 	"time"
 
+	apis "github.com/ChangHChen/Reading-Copilot/webGateway/internal/APIs"
 	"github.com/ChangHChen/Reading-Copilot/webGateway/internal/models"
 	"github.com/alexedwards/scs/mysqlstore"
 	"github.com/alexedwards/scs/v2"
@@ -90,6 +93,7 @@ func (app *application) newTemplateData(r *http.Request, form any) templateData 
 		BookList:        bookList{},
 		Book:            models.BookMeta{},
 		CurPage:         1,
+		APIKeys:         apiKeys{},
 	}
 	if newData.IsAuthenticated {
 		newData.UserName = app.sessionManager.GetString(r.Context(), "authenticatedUserName")
@@ -122,14 +126,48 @@ func (app *application) isAuthenticated(r *http.Request) bool {
 
 }
 
-func processWithLLM(message string) string {
-	return "Repeat: " + message
-}
-
 func (app *application) redirectToLastURL(w http.ResponseWriter, r *http.Request) {
 	lastURL := app.sessionManager.GetString(r.Context(), "lastURL")
 	if lastURL == "" {
 		lastURL = "/"
 	}
 	http.Redirect(w, r, lastURL, http.StatusSeeOther)
+}
+
+func processWithLLM(msg ChatMessage, bookID int) (string, error) {
+	requestData := apis.ChatRequest{
+		Model:       msg.Model,
+		BookID:      bookID,
+		Progress:    msg.Page,
+		UserMessage: msg.Message,
+	}
+
+	requestJson, err := json.Marshal(requestData)
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequest("POST", "https://localhost:4010/chat", bytes.NewBuffer(requestJson))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	responseJson, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	var responseData apis.ChatResponse
+	if err := json.Unmarshal([]byte(responseJson), &responseData); err != nil {
+		return "", err
+	}
+
+	if responseData.Error != "" {
+		return "", errors.New(responseData.Error)
+	}
+	return responseData.ResponseMessage, nil
 }

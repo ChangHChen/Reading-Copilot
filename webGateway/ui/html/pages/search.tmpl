@@ -1,11 +1,6 @@
 {{define "title"}}Search{{end}}
 
 {{define "main"}}
-    <form id="searchForm" action="/search" method="GET" class="search-form"> 
-        <input type="text" name="keyword" placeholder="Search by title, auther, genre..." value="{{.BookList.SearchKeyWords}}" required>
-        <button type="submit">Search</button>
-    </form>
-
     <h3>Search Result</h3>
         {{if .BookList.Error}}
             <div class='error'>{{.BookList.Error}}</div>
