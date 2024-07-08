@@ -35,6 +35,12 @@ func (app *application) bookView(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusNotFound)
 		return
 	}
+	msg, err := buildUpBook(bookID)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+	app.logger.Debug(msg)
 	data := app.newTemplateData(r, nil)
 	data.Book, err = app.books.GetBookByID(bookID)
 	if err != nil {

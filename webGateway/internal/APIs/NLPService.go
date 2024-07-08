@@ -18,5 +18,5 @@ type BuildBookRequest struct {
 }
 
 type BuildBookResponse struct {
-	Error string `json:"error"`
+	Msg string `json:"msg"`
 }
