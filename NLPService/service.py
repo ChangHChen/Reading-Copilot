@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
 from angle_emb import AnglE
-from utils import milvus_helper
-import logging
+from utils import milvus_helper, const
+from vllm import LLM, SamplingParams
+import logging, os
+
 
 app = Flask(__name__)
 logging.basicConfig(
@@ -11,6 +13,12 @@ logging.basicConfig(
 )
 app.logger.addHandler(logging.StreamHandler())
 ebdModel = AnglE.from_pretrained('WhereIsAI/UAE-Large-V1', pooling_strategy='cls').cuda()
+
+localModelPath = os.getenv('LOCAL_LLM_PATH', '')
+if localModelPath != '':
+    localmodel = LLM(model=localModelPath)
+sampling_params = SamplingParams(temperature=0.7, top_p=0.9, max_tokens=800)
+
 @app.route('/chat', methods=['POST'])
 def chat():
     data = request.get_json() 
@@ -20,8 +28,12 @@ def chat():
     progress = data.get('progress')
     userMessage = data.get('userMessage')
     topText = milvus_helper.retriveKnowledge("reading_copilot", f"book_{bookID}", bookID, userMessage, progress, ebdModel)
-    responseMessage = f"book: {bookID}, page: {progress}, model: {model}, repeat: {userMessage}, most similar text: {topText}"
-    return jsonify({"responseMessage": responseMessage, "error": ""})
+    user_message = const.COPILOT.format(
+        contents="\n".join([page for page in topText]), question=userMessage
+    )
+    prompt = const.TEMPLATE.format(user_message=user_message)
+    outputs = model.generate(prompt, sampling_params)[0].outputs[0].text
+    return jsonify({"responseMessage": outputs, "error": ""})
 
 @app.route('/build', methods=['POST'])
 def milvus():
