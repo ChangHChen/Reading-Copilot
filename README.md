@@ -2,6 +2,14 @@
 
 Reading Copilot is a comprehensive web application designed to enhance the reading experience by providing dynamic interactions with books sourced from the Gutenberg Project. It incorporates advanced NLP services to support non-spoiler interactions and offers robust user management and book interaction features.
 
+![Screenshot of homepage](/assets/homepage.png)
+![Screenshot of aboutpage](/assets/aboutpage.png)
+![Screenshot of search](/assets/search.png)
+![Screenshot of userprofile](/assets/userprofile.png)
+![Screenshot of readinghistory](/assets/readinghistory.png)
+![Screenshot of readingUser](/assets/readingUser.png)
+![Screenshot of readingGuest](/assets/readingGuest.png)
+
 ## Components
 
 ### Main Service
